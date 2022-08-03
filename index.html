@@ -62,18 +62,6 @@
         <script src="data/Parcels_1.js"></script>
         <script src="data/Awards_2.js"></script>
         <script>
-		navigator.geolocation.getCurrentPosition(position => {
-		console.log(position);
-		const { coords: { latitude, longitude }} = position;
-		var marker = new L.marker([latitude, longitude], {
-			draggable: true,
-			autoPan: true
-		}).addTo(mymap);
-
-		mymap.setView([latitude, longitude], 13)
-
-		console.log(marker);
-		})
 		function getcss(name) {
 			return getComputedStyle(document.documentElement).getPropertyValue(name);
 		}
@@ -429,6 +417,39 @@
 			layercontrol = L.control.layers(baseMaps,{'Awards<br /><table><tr><td align="center"><div id="circle"></div></td><td>Existing, Distinctive</td></tr><tr><td align="center"><div id="circle" style="width: var(--medium-size);height: var(--medium-size);"></div></td><td>Existing, Beneficial</td></tr><tr><td align="center"><div id="circle" style="width: var(--small-size);height: var(--small-size);"></div></td><td>Existing, Entry</td></tr><tr><td align="center"><div id="diamond" style="width: var(--small-size);height: var(--small-size);"></div></td><td align="right">Existing, Not assigned</td></tr><tr><td align="center"><div id="circle" style="width: var(--small-size);height: var(--small-size);background: var(--new-color);"></div></td><td>New, Entry</td></tr></table>': layer_Awards_2,'<img src="legend/Parcels_1.png" /> Parcels': layer_Parcels_1,"Esri Imagery": layer_ESRISatelliteArcGISWorld_Imagery_0,}).addTo(map);
 		});
 		setBounds();
+		if(!navigator.geolocation) {
+			console.log("Your browser doesn't support geolocation feature!")
+		} else {
+			setInterval(() => {
+				navigator.geolocation.getCurrentPosition(getPosition)
+			}, 5000);
+		}
+
+		var marker, circle;
+
+		function getPosition(position){
+			// console.log(position)
+			var lat = position.coords.latitude
+			var long = position.coords.longitude
+			var accuracy = position.coords.accuracy
+
+			if(marker) {
+				map.removeLayer(marker)
+			}
+
+			if(circle) {
+				map.removeLayer(circle)
+			}
+
+			marker = L.marker([lat, long])
+			circle = L.circle([lat, long], {radius: accuracy})
+
+			var featureGroup = L.featureGroup([marker, circle]).addTo(map)
+
+			map.fitBounds(featureGroup.getBounds())
+
+			console.log("Your coordinate is: Lat: "+ lat +" Long: "+ long+ " Accuracy: "+ accuracy)
+		}
         </script>
     </body>
 </html>
