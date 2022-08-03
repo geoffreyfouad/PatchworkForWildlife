@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+		/* Change the colors in :root - No need to make changes elsewhere */
+		:root {
+			--existing-color: #F5F5DC;
+			--new-color: #3CB371;
+			--medium-size: 10px;
+			--small-size: 8px;
+			--diamond-size: 9px;
+		}
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+		#circle {
+			width: 12px;
+			height: 12px;
+			-webkit-border-radius: 50%;
+			-moz-border-radius: 50%;
+			border-radius: 50%;
+			border:1px solid rgba(35,35,35,1.0);
+			background: var(--existing-color);
+		}
+		#diamond {
+			width: 8px;
+			height: 8px;
+			transform:rotate(45deg);
+			border:1px solid rgba(35,35,35,1.0);
+			background: var(--existing-color);
+		}
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet-svg-shape-markers.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="data/Parcels_1.js"></script>
+        <script src="data/Awards_2.js"></script>
+        <script>
+		navigator.geolocation.getCurrentPosition(position => {
+		console.log(position);
+		const { coords: { latitude, longitude }} = position;
+		var marker = new L.marker([latitude, longitude], {
+			draggable: true,
+			autoPan: true
+		}).addTo(mymap);
+
+		mymap.setView([latitude, longitude], 13)
+
+		console.log(marker);
+		})
+		function getcss(name) {
+			return getComputedStyle(document.documentElement).getPropertyValue(name);
+		}
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[40.16557036621814,-74.03555029989961],[40.175225634600864,-74.01601862867066]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'feet',
+            secondaryLengthUnit: 'miles',
+            primaryAreaUnit: 'sqfeet',
+            secondaryAreaUnit: 'acres'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_ESRISatelliteArcGISWorld_Imagery_0');
+        map.getPane('pane_ESRISatelliteArcGISWorld_Imagery_0').style.zIndex = 400;
+        var layer_ESRISatelliteArcGISWorld_Imagery_0 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            pane: 'pane_ESRISatelliteArcGISWorld_Imagery_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_ESRISatelliteArcGISWorld_Imagery_0;
+        map.addLayer(layer_ESRISatelliteArcGISWorld_Imagery_0);
+        function pop_Parcels_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PAMS_PIN'] !== null ? autolinker.link(feature.properties['PAMS_PIN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MUN'] !== null ? autolinker.link(feature.properties['MUN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BLOCK'] !== null ? autolinker.link(feature.properties['BLOCK'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LOT'] !== null ? autolinker.link(feature.properties['LOT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['QCODE'] !== null ? autolinker.link(feature.properties['QCODE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Leng'] !== null ? autolinker.link(feature.properties['Shape_Leng'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Area'] !== null ? autolinker.link(feature.properties['Shape_Area'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PROP_CLASS'] !== null ? autolinker.link(feature.properties['PROP_CLASS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['COUNTY'] !== null ? autolinker.link(feature.properties['COUNTY'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MUN_NAME'] !== null ? autolinker.link(feature.properties['MUN_NAME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PROP_LOC'] !== null ? autolinker.link(feature.properties['PROP_LOC'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ST_ADDRESS'] !== null ? autolinker.link(feature.properties['ST_ADDRESS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CITY_STATE'] !== null ? autolinker.link(feature.properties['CITY_STATE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ZIP_CODE'] !== null ? autolinker.link(feature.properties['ZIP_CODE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LAND_VAL'] !== null ? autolinker.link(feature.properties['LAND_VAL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['IMPRVT_VAL'] !== null ? autolinker.link(feature.properties['IMPRVT_VAL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NET_VALUE'] !== null ? autolinker.link(feature.properties['NET_VALUE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LAST_YR_TX'] !== null ? autolinker.link(feature.properties['LAST_YR_TX'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BLDG_DESC'] !== null ? autolinker.link(feature.properties['BLDG_DESC'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LAND_DESC'] !== null ? autolinker.link(feature.properties['LAND_DESC'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CALC_ACRE'] !== null ? autolinker.link(feature.properties['CALC_ACRE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ADD_LOTS1'] !== null ? autolinker.link(feature.properties['ADD_LOTS1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ADD_LOTS2'] !== null ? autolinker.link(feature.properties['ADD_LOTS2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FAC_NAME'] !== null ? autolinker.link(feature.properties['FAC_NAME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PROP_USE'] !== null ? autolinker.link(feature.properties['PROP_USE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BLDG_CLASS'] !== null ? autolinker.link(feature.properties['BLDG_CLASS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DEED_BOOK'] !== null ? autolinker.link(feature.properties['DEED_BOOK'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DEED_PAGE'] !== null ? autolinker.link(feature.properties['DEED_PAGE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DEED_DATE'] !== null ? autolinker.link(feature.properties['DEED_DATE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['YR_CONSTR'] !== null ? autolinker.link(feature.properties['YR_CONSTR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SALES_CODE'] !== null ? autolinker.link(feature.properties['SALES_CODE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SALE_PRICE'] !== null ? autolinker.link(feature.properties['SALE_PRICE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DWELL'] !== null ? autolinker.link(feature.properties['DWELL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OLD_PROPID'] !== null ? autolinker.link(feature.properties['OLD_PROPID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ZIP5'] !== null ? autolinker.link(feature.properties['ZIP5'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ZIP_PLUS4'] !== null ? autolinker.link(feature.properties['ZIP_PLUS4'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Parcels_1_0() {
+            return {
+                pane: 'pane_Parcels_1',
+                opacity: 1,
+                color: 'rgba(223,239,242,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_Parcels_1');
+        map.getPane('pane_Parcels_1').style.zIndex = 401;
+        map.getPane('pane_Parcels_1').style['mix-blend-mode'] = 'normal';
+        var layer_Parcels_1 = new L.geoJson(json_Parcels_1, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Parcels_1',
+            layerName: 'layer_Parcels_1',
+            pane: 'pane_Parcels_1',
+            onEachFeature: pop_Parcels_1,
+            style: style_Parcels_1_0,
+        });
+        bounds_group.addLayer(layer_Parcels_1);
+        map.addLayer(layer_Parcels_1);
+        function pop_Awards_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Award Date</th>\
+                        <td>' + (feature.properties['Award_Date'] !== null ? autolinker.link(feature.properties['Award_Date'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+						<th scope="row">Address</th>\
+                        <td colspan="2">' + (feature.properties['Geocoding'] !== null ? autolinker.link(feature.properties['Geocoding'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Yard</th>\
+                        <td>' + (feature.properties['Yard'] !== null ? autolinker.link(feature.properties['Yard'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Award Level</th>\
+                        <td>' + (feature.properties['Level'] !== null ? autolinker.link(feature.properties['Level'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Square Feet</th>\
+                        <td>' + (feature.properties['Sq_Ft'] !== null ? autolinker.link(feature.properties['Sq_Ft'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Trees'] !== null ? autolinker.link(feature.properties['Trees'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">New Square Feet</th>\
+                        <td>' + (feature.properties['New_Sq_Ft'] !== null ? autolinker.link(feature.properties['New_Sq_Ft'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Features</th>\
+                        <td>' + (feature.properties['Features'] !== null ? autolinker.link(feature.properties['Features'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+					<tr>\
+                        <th scope="row">Photo Link</th>\
+                        <td>' + (feature.properties['Photos'] !== null ? autolinker.link(feature.properties['Photos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+        function style_Awards_2_0(feature) {
+			var pointradius;
+				if (map.getZoom() < 18) {
+					pointradius = 1.0;
+				} else {
+					pointradius = 2.0;
+				}
+            switch(String(feature.properties['New'])+String(feature.properties['Level'])) {
+                case 'ExistingDistinctive':
+                    return {
+                pane: 'pane_Awards_2',
+				shape: 'circle',
+                radius: 8.0*pointradius,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: getcss('--existing-color'),
+                interactive: true,
+            }
+                    break;
+				case 'ExistingBeneficial':
+                    return {
+                pane: 'pane_Awards_2',
+				shape: 'circle',
+                radius: 6.0*pointradius,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: getcss('--existing-color'),
+                interactive: true,
+            }
+                    break;
+                case 'ExistingEntry':
+                    return {
+                pane: 'pane_Awards_2',
+				shape: 'circle',
+                radius: 4.0*pointradius,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: getcss('--existing-color'),
+                interactive: true,
+            }
+                    break;
+				case 'Existingnull':
+                    return {
+                pane: 'pane_Awards_2',
+				shape: 'diamond',
+                radius: 5.0*pointradius,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: getcss('--existing-color'),
+                interactive: true,
+            }
+                    break;
+				case 'NewEntry':
+                    return {
+                pane: 'pane_Awards_2',
+                shape: 'circle',
+                radius: 5.0*pointradius,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: getcss('--new-color'),
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Awards_2');
+        map.getPane('pane_Awards_2').style.zIndex = 402;
+        map.getPane('pane_Awards_2').style['mix-blend-mode'] = 'normal';
+		function addAwards(){
+			layer_Awards_2 = L.geoJson(json_Awards_2, {
+				attribution: '',
+				interactive: true,
+				dataVar: 'json_Awards_2',
+				layerName: 'layer_Awards_2',
+				pane: 'pane_Awards_2',
+				onEachFeature: pop_Awards_2,
+				pointToLayer: function (feature, latlng) {
+					var context = {
+						feature: feature,
+						variables: {}
+					};
+					return L.shapeMarker(latlng, style_Awards_2_0(feature));
+				},
+        });
+		bounds_group.addLayer(layer_Awards_2);
+		map.addLayer(layer_Awards_2);
+		}
+		addAwards();
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        var baseMaps = {};
+		var layercontrol = L.control.layers(baseMaps,{'Awards<br /><table><tr><td align="center"><div id="circle"></div></td><td>Existing, Distinctive</td></tr><tr><td align="center"><div id="circle" style="width: var(--medium-size);height: var(--medium-size);"></div></td><td>Existing, Beneficial</td></tr><tr><td align="center"><div id="circle" style="width: var(--small-size);height: var(--small-size);"></div></td><td>Existing, Entry</td></tr><tr><td align="center"><div id="diamond" style="width: var(--small-size);height: var(--small-size);"></div></td><td align="right">Existing, Not assigned</td></tr><tr><td align="center"><div id="circle" style="width: var(--small-size);height: var(--small-size);background: var(--new-color);"></div></td><td>New, Entry</td></tr></table>': layer_Awards_2,'<img src="legend/Parcels_1.png" /> Parcels': layer_Parcels_1,"Esri Imagery": layer_ESRISatelliteArcGISWorld_Imagery_0,}).addTo(map);
+		map.on("zoomend", function(){
+			layer_Awards_2.removeFrom(map);
+			layercontrol.remove(map);
+			addAwards();
+			layercontrol = L.control.layers(baseMaps,{'Awards<br /><table><tr><td align="center"><div id="circle"></div></td><td>Existing, Distinctive</td></tr><tr><td align="center"><div id="circle" style="width: var(--medium-size);height: var(--medium-size);"></div></td><td>Existing, Beneficial</td></tr><tr><td align="center"><div id="circle" style="width: var(--small-size);height: var(--small-size);"></div></td><td>Existing, Entry</td></tr><tr><td align="center"><div id="diamond" style="width: var(--small-size);height: var(--small-size);"></div></td><td align="right">Existing, Not assigned</td></tr><tr><td align="center"><div id="circle" style="width: var(--small-size);height: var(--small-size);background: var(--new-color);"></div></td><td>New, Entry</td></tr></table>': layer_Awards_2,'<img src="legend/Parcels_1.png" /> Parcels': layer_Parcels_1,"Esri Imagery": layer_ESRISatelliteArcGISWorld_Imagery_0,}).addTo(map);
+		});
+		setBounds();
+        </script>
+    </body>
+</html>
