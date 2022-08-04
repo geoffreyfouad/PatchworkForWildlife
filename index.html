@@ -440,7 +440,7 @@
 				map.removeLayer(circle)
 			}
 
-			marker = L.circleMarker([lat, long],{radius:5,color:#4A89F3})
+			marker = L.circleMarker([lat, long],{radius:5,color:'#4A89F3'})
 			circle = L.circle([lat, long], {radius: accuracy})
 
 			var featureGroup = L.featureGroup([marker, circle]).addTo(map)
