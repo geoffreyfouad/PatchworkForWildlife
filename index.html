@@ -441,6 +441,7 @@
 			}
 
 			marker = L.circleMarker([lat, long])
+			marker.setStyle({fillColor:'#4285F4'})
 			circle = L.circle([lat, long], {radius: accuracy})
 
 			var featureGroup = L.featureGroup([marker, circle]).addTo(map)
