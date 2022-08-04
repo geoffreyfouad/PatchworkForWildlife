@@ -41,6 +41,17 @@
 			border:1px solid rgba(35,35,35,1.0);
 			background: var(--existing-color);
 		}
+		.circleicon {
+			display: table-cell;
+			vertical-align: middle;
+			border-radius: 50%;
+			border-style: solid;
+			background: rgba(0, 57, 128, 0.2);
+			border-color: #3388FF;
+			color: white;
+			width: 4px;
+			height: 4px;
+		}
         </style>
         <title></title>
     </head>
@@ -439,8 +450,10 @@
 			if(circle) {
 				map.removeLayer(circle)
 			}
+			
+			var locatoricon = L.divIcon({className: 'circleicon'});
 
-			marker = L.marker([lat, long])
+			marker = L.marker([lat, long], {icon: locatoricon})
 			circle = L.circle([lat, long], {radius: accuracy})
 
 			var featureGroup = L.featureGroup([marker, circle]).addTo(map)
